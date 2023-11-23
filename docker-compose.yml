@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    env_file: .env
+    restart: always
+    ports:
+        - '5432:5432'
+    volumes:
+      - postgres-vol:/var/lib/postgresql
+    
+volumes:
+  postgres-vol:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/guribeir/postgres_data'
