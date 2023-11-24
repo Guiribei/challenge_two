@@ -9,7 +9,7 @@ app.use(bodyParser.json());
 app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
-	res.json({ message: "Bem-vindo à API de autenticação." });
+  res.json({message: 'Bem-vindo à API de autenticação.'});
 });
 
 module.exports = app;
