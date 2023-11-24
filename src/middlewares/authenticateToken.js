@@ -6,7 +6,6 @@ const authenticateToken = (req, res, next) => {
 
   if (!token) return res.status(401).json({mensagem: 'Não autorizado'});
 
-  console.log(`Esta é a palavraformadora: ${process.env.JWT_SECRET}`);
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({mensagem: 'Sessão inválida'});
     req.user = user;
