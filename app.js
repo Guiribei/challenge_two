@@ -12,4 +12,8 @@ app.get('/', (req, res) => {
   res.json({message: 'Bem-vindo à API de autenticação.'});
 });
 
+app.use((req, res, next) => {
+  res.status(404).json({mensagem: 'Endpoint não encontrado'});
+});
+
 module.exports = app;

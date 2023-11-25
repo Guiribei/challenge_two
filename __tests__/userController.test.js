@@ -17,24 +17,44 @@ describe('Sign Up', () => {
     const response = await request(app)
         .post('/api/users/signup')
         .send({
+          nome: 'Teste',
           email: 'test@exampletest.com',
-          password: 'password123',
+          senha: 'password123',
+          telefones: [{numero: '123456789', ddd: '11'}],
         });
 
     expect(response.statusCode).toBe(201);
-    expect(response.body.email).toBe('test@exampletest.com');
-    expect(response.body.password).toBe();
+    expect(response.body).toEqual({
+      id: expect.any(Number),
+      data_criacao: expect.any(String),
+      data_atualizacao: expect.any(String),
+      ultimo_login: expect.any(String),
+      token: expect.any(String),
+    });
+    expect(response.body.senha).toBeUndefined();
   });
 
   test('Não deve permitir a criação de um usuário com e-mail já existente',
       async () => {
+        // Primeira tentativa de cadastro
         await request(app)
             .post('/api/users/signup')
-            .send({email: 'duplicado@example.com', password: 'senha123'});
+            .send({
+              nome: 'Usuário Duplicado',
+              email: 'duplicado@example.com',
+              senha: 'senha123',
+              telefones: [{numero: '123456789', ddd: '11'}],
+            });
 
+        // Segunda tentativa de cadastro com o mesmo e-mail
         const response = await request(app)
             .post('/api/users/signup')
-            .send({email: 'duplicado@example.com', password: 'senha123'});
+            .send({
+              nome: 'Usuário Duplicado',
+              email: 'duplicado@example.com',
+              senha: 'senha123',
+              telefones: [{numero: '123456789', ddd: '11'}],
+            });
 
         expect(response.statusCode).toBe(400);
         expect(response.body).toEqual({mensagem: 'E-mail já existente'});
@@ -80,7 +100,15 @@ describe('Recuperação de Informações do Usuário', () => {
         .set('Authorization', `Bearer ${token}`);
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.email).toBe('test@exampletest.com');
+    expect(response.body).toEqual({
+      id: expect.any(Number),
+      nome: 'Teste',
+      email: 'test@exampletest.com',
+      telefones: [{numero: '123456789', ddd: '11'}],
+      data_criacao: expect.any(String),
+      data_atualizacao: expect.any(String),
+      ultimo_login: expect.any(String),
+    });
   });
 
   test('Não deve retornar informações do usuário com token inexistente',
@@ -104,6 +132,16 @@ describe('Recuperação de Informações do Usuário', () => {
         expect(response.statusCode).toBe(403);
         expect(response.body).toEqual({mensagem: 'Sessão inválida'});
       });
+});
+
+describe('Endpoint Não Existente', () => {
+  test('Deve retornar 404 para rotas não definidas', async () => {
+    const response = await request(app)
+        .get('/caminho/que/nao/existe');
+
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toEqual({mensagem: 'Endpoint não encontrado'});
+  });
 });
 
 afterAll(async () => {
