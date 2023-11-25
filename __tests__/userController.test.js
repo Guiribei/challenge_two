@@ -63,30 +63,53 @@ describe('Sign Up', () => {
 
 describe('Sign In', () => {
   test('Deve autenticar o usuário e retornar um token JWT', async () => {
+    await request(app)
+        .post('/api/users/signup')
+        .send({
+          nome: 'Teste',
+          email: 'test@exampletest.com',
+          senha: 'password123',
+          telefones: [{numero: '123456789', ddd: '11'}],
+        });
+
     const response = await request(app)
         .post('/api/users/signin')
         .send({
           email: 'test@exampletest.com',
-          password: 'password123',
+          senha: 'password123',
         });
     token = response.body.token;
     expect(response.statusCode).toBe(200);
-    expect(response.body.token).toBeDefined();
+    expect(response.body).toEqual({
+      id: expect.any(Number),
+      data_criacao: expect.any(String),
+      data_atualizacao: expect.any(String),
+      ultimo_login: expect.any(String),
+      token: expect.any(String),
+    });
   });
+});
 
-  test('Não deve autenticar com e-mail inexistente', async () => {
+describe('Sign In Errors', () => {
+  test('Deve retornar erro se o e-mail não estiver cadastrado', async () => {
     const response = await request(app)
         .post('/api/users/signin')
-        .send({email: 'naoexistente@example.com', password: 'senha123'});
+        .send({
+          email: 'emailnaocadastrado@example.com',
+          senha: 'senhaqualquer',
+        });
 
     expect(response.statusCode).toBe(401);
     expect(response.body).toEqual({mensagem: 'Usuário e/ou senha inválidos'});
   });
 
-  test('Não deve autenticar com senha incorreta', async () => {
+  test('Deve retornar erro se a senha estiver incorreta', async () => {
     const response = await request(app)
         .post('/api/users/signin')
-        .send({email: 'test@exampletest.com', password: 'wrongone'});
+        .send({
+          email: 'test@exampletest.com',
+          senha: 'senhaincorreta',
+        });
 
     expect(response.statusCode).toBe(401);
     expect(response.body).toEqual({mensagem: 'Usuário e/ou senha inválidos'});

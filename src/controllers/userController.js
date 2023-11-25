@@ -49,17 +49,20 @@ const userController = {
   },
   async signIn(req, res) {
     try {
-      const {email, password} = req.body;
+      const {email, senha} = req.body;
 
       const user = await User.findOne({where: {email}});
       if (!user) {
         return res.status(401).json({mensagem: 'Usuário e/ou senha inválidos'});
       }
 
-      const isMatch = await bcrypt.compare(password, user.password);
+      const isMatch = await bcrypt.compare(senha, user.password);
       if (!isMatch) {
         return res.status(401).json({mensagem: 'Usuário e/ou senha inválidos'});
       }
+
+      user.ultimo_login = new Date();
+      await user.save();
 
       const token = jwt.sign(
           {id: user.id},
@@ -67,10 +70,16 @@ const userController = {
           {expiresIn: '30m'},
       );
 
-      res.json({token});
+      res.json({
+        id: user.id,
+        data_criacao: user.createdAt,
+        data_atualizacao: user.updatedAt,
+        ultimo_login: user.ultimo_login,
+        token: token,
+      });
     } catch (error) {
       console.error('Erro ao autenticar usuário:', error);
-      res.status(500).json({mensagem: 'Erro ao autenticar usuário'});
+      res.status(500).json({mensagem: 'Erro interno do servidor'});
     }
   },
   async getUser(req, res) {
