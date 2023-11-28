@@ -25,6 +25,18 @@ Antes de começar, você precisa ter instalado em sua máquina:
 ```bash
    npm install
 ```
+
+## Criando um .env
+
+As variáveis com dados sensíveis utilizadas tanto pelo compose quanto pela aplicação precisam estar num arquivo .env que não está neste repositório. É preciso criar um arquivo .env que contenha as variáveis:
+
+`POSTGRES_USER=` <br/>
+`POSTGRES_PASSWORD=`  <br/>
+`POSTGRES_DB=`  <br/>
+`POSTGRES_PORT=` <br/>
+`POSTGRES_HOST=`  <br/>
+`JWT_SECRET=`  <br/>
+
 ## Executando o PostgreSQL com Docker Compose
 
 Para iniciar o serviço do PostgreSQL:
